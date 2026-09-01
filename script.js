@@ -87,6 +87,79 @@
     });
   }
 
+  function setupFaqCards() {
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".faq-list details"));
+
+    cards.forEach(function (card) {
+      var summary = card.querySelector("summary");
+      var answer = card.querySelector(".faq-answer");
+
+      if (!summary || !answer) {
+        return;
+      }
+
+      if (hasGsap && !reduceMotionQuery.matches) {
+        gsap.set(answer, {
+          height: card.open ? "auto" : 0,
+          autoAlpha: card.open ? 1 : 0
+        });
+      }
+
+      summary.addEventListener("click", function (event) {
+        if (!hasGsap || reduceMotionQuery.matches) {
+          return;
+        }
+
+        event.preventDefault();
+        gsap.killTweensOf([card, answer]);
+
+        if (card.open) {
+          gsap.set(answer, { height: answer.offsetHeight, autoAlpha: 1 });
+          gsap.to(answer, {
+            height: 0,
+            autoAlpha: 0,
+            duration: motion.duration.panel,
+            ease: motion.ease.interaction,
+            overwrite: "auto",
+            onComplete: function () {
+              card.open = false;
+              gsap.set(answer, { height: 0 });
+              refreshScrollTriggers();
+            }
+          });
+          return;
+        }
+
+        card.open = true;
+        gsap.set(answer, { height: 0, autoAlpha: 0 });
+
+        gsap.timeline({
+          onComplete: function () {
+            gsap.set(answer, { height: "auto" });
+            refreshScrollTriggers();
+          }
+        })
+          .to(answer, {
+            height: answer.scrollHeight,
+            autoAlpha: 1,
+            duration: motion.duration.panel,
+            ease: motion.ease.smooth,
+            overwrite: "auto"
+          })
+          .fromTo(card, {
+            y: 4,
+            scale: 0.992
+          }, {
+            y: 0,
+            scale: 1,
+            duration: motion.duration.micro,
+            ease: motion.ease.interaction,
+            overwrite: "auto"
+          }, 0);
+      });
+    });
+  }
+
   function setupSmoothNavigation() {
     var internalLinks = Array.prototype.slice.call(document.querySelectorAll('a[href^="#"]'));
 
@@ -519,6 +592,7 @@
   }
 
   setupTabs();
+  setupFaqCards();
   setupSmoothNavigation();
 
   if (!hasGsap || !window.ScrollTrigger) {

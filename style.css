@@ -103,6 +103,22 @@ a {
   transform: none;
 }
 
+.w0qlabs-watermark {
+  position: fixed;
+  right: clamp(12px, 2vw, 28px);
+  bottom: clamp(10px, 2vw, 22px);
+  z-index: 70;
+  pointer-events: none;
+  color: rgba(75, 46, 32, 0.24);
+  font-size: clamp(0.72rem, 1.5vw, 0.98rem);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-5deg);
+  mix-blend-mode: multiply;
+}
+
 .wrap {
   width: min(1180px, calc(100% - 40px));
   margin-inline: auto;
@@ -163,49 +179,11 @@ a {
   background: var(--orange);
 }
 
-.brand-kids {
-  position: relative;
-  display: grid;
-  width: 52px;
-  height: 52px;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: end;
-  gap: 2px;
+.brand-mark {
+  width: clamp(58px, 7vw, 86px);
+  height: auto;
   flex: 0 0 auto;
-}
-
-.brand-kids span {
-  position: relative;
-  display: block;
-  height: 28px;
-  border: 3px solid var(--brown);
-  border-radius: 50% 50% 42% 42%;
-  background: #fff;
-}
-
-.brand-kids span::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: -19px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  transform: translateX(-50%);
-  background: var(--pink);
-  box-shadow: inset -2px -3px 0 rgba(75, 46, 32, 0.16);
-}
-
-.brand-kids span:nth-child(2) {
-  height: 38px;
-}
-
-.brand-kids span:nth-child(2)::before {
-  background: var(--teal);
-}
-
-.brand-kids span:nth-child(3)::before {
-  background: var(--green);
+  filter: drop-shadow(0 8px 10px rgba(75, 46, 32, 0.12));
 }
 
 .site-nav {
@@ -234,6 +212,10 @@ a {
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--duration-ui) var(--ease-out);
+}
+
+html[data-gsap-ready="true"] .site-nav a::after {
+  display: none;
 }
 
 .header-action,
@@ -938,20 +920,69 @@ address {
 }
 
 details {
+  overflow: hidden;
   border: 2px solid rgba(255, 122, 0, 0.2);
   border-radius: var(--radius);
   background: #fff;
   box-shadow: 0 14px 34px rgba(75, 46, 32, 0.08);
+  transition:
+    border-color var(--duration-ui) var(--ease-out),
+    box-shadow var(--duration-ui) var(--ease-out);
+}
+
+details[open] {
+  border-color: rgba(255, 122, 0, 0.42);
+  box-shadow: 0 18px 40px rgba(75, 46, 32, 0.11);
 }
 
 summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   cursor: pointer;
+  list-style: none;
   padding: 18px 20px;
   color: var(--brown);
   font-weight: 800;
 }
 
-details p {
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::after {
+  content: "+";
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 2px solid rgba(255, 122, 0, 0.32);
+  border-radius: 50%;
+  color: var(--orange-deep);
+  font-family: "Baloo 2", cursive;
+  font-size: 1.35rem;
+  line-height: 1;
+  transition:
+    transform var(--duration-panel) var(--ease-out),
+    color var(--duration-ui) ease,
+    background var(--duration-ui) ease,
+    border-color var(--duration-ui) ease;
+}
+
+details[open] summary::after {
+  color: #fff;
+  background: var(--orange);
+  border-color: var(--orange);
+  transform: rotate(45deg);
+}
+
+.faq-answer {
+  overflow: hidden;
+}
+
+.faq-answer p {
   margin: 0;
   padding: 0 20px 20px;
   color: var(--muted);
@@ -1009,7 +1040,9 @@ details p {
 
 .whats-link {
   display: grid;
-  gap: 4px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
   padding: 18px 20px;
   border: 2px solid rgba(255, 255, 255, 0.42);
   border-radius: var(--radius);
@@ -1023,11 +1056,25 @@ details p {
   background: rgba(255, 255, 255, 0.22);
 }
 
+.whats-icon {
+  width: 34px;
+  height: 34px;
+  color: #fff;
+  fill: currentColor;
+  filter: drop-shadow(0 6px 12px rgba(75, 46, 32, 0.12));
+}
+
+.whats-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
 .whats-link strong {
   font-size: 1rem;
 }
 
-.whats-link span {
+.whats-copy > span {
   font-size: 0.9rem;
   opacity: 0.9;
 }
@@ -1200,9 +1247,8 @@ address {
     width: 18px;
   }
 
-  .brand-kids {
-    width: 42px;
-    height: 42px;
+  .brand-mark {
+    width: 50px;
   }
 
   .header-action {
