@@ -12,7 +12,6 @@
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
-  <div class="w0qlabs-watermark" aria-hidden="true">w0qlabs</div>
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
     <symbol id="icon-shield-check" viewBox="0 0 48 48">
       <path d="M24 5 39 11v10c0 10.4-6.1 17.5-15 22-8.9-4.5-15-11.6-15-22V11L24 5Z"/>
@@ -109,7 +108,25 @@
         <a href="#contato">Contato</a>
       </nav>
       <a class="header-action" href="https://wa.me/5514996840898" target="_blank" rel="noopener">Orçamento</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Abrir menu">
+        <svg class="menu-icon menu-icon-open" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <svg class="menu-icon menu-icon-close" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m6 6 12 12M18 6 6 18"></path>
+        </svg>
+      </button>
     </div>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Navegação móvel" hidden>
+      <div class="wrap mobile-nav-inner">
+        <a href="#topo">Início</a>
+        <a href="#catalogo">Catálogo</a>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#faq">Dúvidas</a>
+        <a href="#contato">Contato</a>
+        <a class="mobile-budget" href="https://wa.me/5514996840898" target="_blank" rel="noopener">Pedir orçamento</a>
+      </div>
+    </nav>
   </header>
 
   <main id="conteudo">
@@ -400,6 +417,10 @@
         <a href="https://instagram.com/mundoencantadoavare" target="_blank" rel="noopener">Instagram</a>
         <a href="https://facebook.com/mundoencantadoavare" target="_blank" rel="noopener">Facebook</a>
       </div>
+    </div>
+    <div class="w0qlabs-watermark" aria-hidden="true">
+      <img src="assets/woqmonkey.png" alt="">
+      <span>w0q</span>
     </div>
   </footer>
 
