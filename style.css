@@ -439,6 +439,143 @@ html[data-gsap-ready="true"] .site-nav a::after {
   pointer-events: none;
 }
 
+/* Interactive balloons stay below section content and never block its controls. */
+.balloon-host {
+  position: relative;
+}
+
+.balloon-host > .wrap,
+.balloon-host > .hero-grid {
+  position: relative;
+  z-index: 3;
+}
+
+.balloon-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.balloon-layer-foreground {
+  z-index: 4;
+}
+
+.balloon-anchor {
+  position: absolute;
+  width: var(--balloon-size, 58px);
+  margin: 0;
+  padding: 0 0 34px;
+  border: 0;
+  appearance: none;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.balloon-anchor:focus {
+  outline: none;
+}
+
+.balloon-float,
+.balloon-reactor,
+.balloon-body {
+  display: block;
+  width: 100%;
+}
+
+.balloon-body {
+  position: relative;
+  aspect-ratio: 0.8;
+  border: 1px solid rgba(75, 46, 32, 0.1);
+  border-radius: 51% 49% 47% 53% / 44% 45% 55% 56%;
+  background:
+    radial-gradient(circle at 31% 23%, rgba(255, 255, 255, 0.88) 0 7%, rgba(255, 255, 255, 0.26) 8% 17%, transparent 18%),
+    linear-gradient(145deg, var(--balloon-light), var(--balloon-color) 56%, var(--balloon-dark));
+  box-shadow:
+    inset -8px -12px 18px rgba(75, 46, 32, 0.12),
+    inset 6px 8px 14px rgba(255, 255, 255, 0.2),
+    0 8px 16px rgba(75, 46, 32, 0.1);
+}
+
+.balloon-knot {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 35px);
+  width: 12px;
+  height: 10px;
+  border-radius: 2px 2px 5px 5px;
+  background: var(--balloon-dark);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  transform: translateX(-50%);
+}
+
+.balloon-string {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 26px);
+  width: 13px;
+  height: 30px;
+  border-left: 1px solid rgba(75, 46, 32, 0.38);
+  border-radius: 50%;
+  transform: translateX(-2px) rotate(-8deg);
+  transform-origin: top center;
+}
+
+.balloon-float,
+.balloon-reactor {
+  will-change: transform;
+}
+
+.balloon-reactor {
+  will-change: transform, opacity;
+}
+
+.balloon-anchor[data-color="orange"] {
+  --balloon-light: #ffb24d;
+  --balloon-color: var(--orange);
+  --balloon-dark: var(--orange-deep);
+}
+
+.balloon-anchor[data-color="purple"] {
+  --balloon-light: #ad76f7;
+  --balloon-color: var(--purple);
+  --balloon-dark: #5520ad;
+}
+
+.balloon-anchor[data-color="pink"] {
+  --balloon-light: #ff91cf;
+  --balloon-color: var(--pink);
+  --balloon-dark: #d52b8c;
+}
+
+.balloon-anchor[data-color="teal"] {
+  --balloon-light: #63e1df;
+  --balloon-color: var(--teal);
+  --balloon-dark: #008e98;
+}
+
+.balloon-anchor[data-color="yellow"] {
+  --balloon-light: #ffe96a;
+  --balloon-color: var(--yellow);
+  --balloon-dark: #e5ad00;
+}
+
+.balloon-particle {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--balloon-color);
+  pointer-events: none;
+}
+
 .doodle-star {
   right: 7%;
   top: -6px;
@@ -1163,6 +1300,11 @@ address {
     transform: none;
   }
 
+  .balloon-float,
+  .balloon-reactor {
+    will-change: auto;
+  }
+
 }
 
 @media (max-width: 980px) {
@@ -1259,6 +1401,10 @@ address {
 
   .hero-grid {
     gap: 34px;
+  }
+
+  .balloon-anchor {
+    opacity: 0.76;
   }
 
   .hero h1 {
