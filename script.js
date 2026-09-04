@@ -143,74 +143,61 @@
   }
 
   function setupFaqCards() {
-    var cards = Array.prototype.slice.call(document.querySelectorAll(".faq-list details"));
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".faq-item"));
+    var refreshTimer = 0;
+    var records = cards.map(function (card) {
+      return {
+        card: card,
+        question: card.querySelector(".faq-question"),
+        panel: card.querySelector(".faq-panel"),
+        inner: card.querySelector(".faq-panel-inner")
+      };
+    }).filter(function (record) {
+      return record.question && record.panel && record.inner;
+    });
 
-    cards.forEach(function (card) {
-      var summary = card.querySelector("summary");
-      var answer = card.querySelector(".faq-answer");
+    function setFaqItemOpen(record, shouldOpen) {
+      record.card.classList.toggle("is-open", shouldOpen);
+      record.question.setAttribute("aria-expanded", String(shouldOpen));
+      record.panel.setAttribute("aria-hidden", String(!shouldOpen));
+      record.panel.inert = !shouldOpen;
 
-      if (!summary || !answer) {
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(
+        refreshScrollTriggers,
+        reduceMotionQuery.matches ? 200 : 360
+      );
+
+      if (!hasGsap) {
         return;
       }
 
-      if (hasGsap && !reduceMotionQuery.matches) {
-        gsap.set(answer, {
-          height: card.open ? "auto" : 0,
-          autoAlpha: card.open ? 1 : 0
+      gsap.killTweensOf(record.inner);
+      gsap.to(record.inner, {
+        autoAlpha: shouldOpen ? 1 : 0,
+        y: shouldOpen ? 0 : -6,
+        duration: reduceMotionQuery.matches ? 0.12 : 0.26,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    }
+
+    records.forEach(function (record) {
+      var isOpen = record.card.classList.contains("is-open");
+
+      record.question.setAttribute("aria-expanded", String(isOpen));
+      record.panel.setAttribute("aria-hidden", String(!isOpen));
+      record.panel.inert = !isOpen;
+
+      if (hasGsap) {
+        gsap.set(record.inner, {
+          autoAlpha: isOpen ? 1 : 0,
+          y: isOpen ? 0 : -6
         });
       }
 
-      summary.addEventListener("click", function (event) {
-        if (!hasGsap || reduceMotionQuery.matches) {
-          return;
-        }
-
-        event.preventDefault();
-        gsap.killTweensOf([card, answer]);
-
-        if (card.open) {
-          gsap.set(answer, { height: answer.offsetHeight, autoAlpha: 1 });
-          gsap.to(answer, {
-            height: 0,
-            autoAlpha: 0,
-            duration: motion.duration.panel,
-            ease: motion.ease.interaction,
-            overwrite: "auto",
-            onComplete: function () {
-              card.open = false;
-              gsap.set(answer, { height: 0 });
-              refreshScrollTriggers();
-            }
-          });
-          return;
-        }
-
-        card.open = true;
-        gsap.set(answer, { height: 0, autoAlpha: 0 });
-
-        gsap.timeline({
-          onComplete: function () {
-            gsap.set(answer, { height: "auto" });
-            refreshScrollTriggers();
-          }
-        })
-          .to(answer, {
-            height: answer.scrollHeight,
-            autoAlpha: 1,
-            duration: motion.duration.panel,
-            ease: motion.ease.smooth,
-            overwrite: "auto"
-          })
-          .fromTo(card, {
-            y: 4,
-            scale: 0.992
-          }, {
-            y: 0,
-            scale: 1,
-            duration: motion.duration.micro,
-            ease: motion.ease.interaction,
-            overwrite: "auto"
-          }, 0);
+      record.question.addEventListener("click", function () {
+        setFaqItemOpen(record, record.question.getAttribute("aria-expanded") !== "true");
       });
     });
   }
@@ -260,27 +247,43 @@
 
   function setupNavIndicator(canHover) {
     var nav = document.querySelector(".site-nav");
-    if (!nav || reduceMotionQuery.matches) {
+    if (!nav) {
       return function () {};
     }
 
     var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+    var mobileLinks = Array.prototype.slice.call(document.querySelectorAll('.mobile-nav a[href^="#"]'));
+    var navigationLinks = links.concat(mobileLinks);
+    var sectionRecords = links.map(function (link) {
+      return {
+        link: link,
+        target: document.querySelector(link.getAttribute("href"))
+      };
+    }).filter(function (record) {
+      return record.target;
+    });
     var indicator = document.createElement("span");
-    var currentLink = links[0];
+    var currentLink = null;
     var hoverHandlers = [];
+    var sectionBoundaries = [];
+    var motionAllowed = !reduceMotionQuery.matches;
 
     indicator.className = "nav-indicator";
     indicator.setAttribute("aria-hidden", "true");
     nav.appendChild(indicator);
 
-    var xTo = gsap.quickTo(indicator, "x", {
-      duration: 0.34,
-      ease: motion.ease.interaction
-    });
-    var scaleTo = gsap.quickTo(indicator, "scaleX", {
-      duration: 0.34,
-      ease: motion.ease.interaction
-    });
+    var xTo = motionAllowed
+      ? gsap.quickTo(indicator, "x", {
+        duration: 0.34,
+        ease: motion.ease.interaction
+      })
+      : null;
+    var scaleTo = motionAllowed
+      ? gsap.quickTo(indicator, "scaleX", {
+        duration: 0.34,
+        ease: motion.ease.interaction
+      })
+      : null;
 
     function moveIndicator(link, immediate) {
       if (!link) {
@@ -291,7 +294,7 @@
       var linkRect = link.getBoundingClientRect();
       var x = linkRect.left - navRect.left;
 
-      if (immediate) {
+      if (immediate || !motionAllowed) {
         gsap.set(indicator, { x: x, scaleX: linkRect.width, autoAlpha: 1 });
         return;
       }
@@ -306,9 +309,15 @@
     }
 
     function setCurrent(link) {
+      if (!link || currentLink === link) {
+        return;
+      }
+
       currentLink = link;
-      links.forEach(function (item) {
-        var isCurrent = item === link;
+      var currentHash = link.getAttribute("href");
+
+      navigationLinks.forEach(function (item) {
+        var isCurrent = item.getAttribute("href") === currentHash;
         item.classList.toggle("is-current", isCurrent);
         if (isCurrent) {
           item.setAttribute("aria-current", "page");
@@ -319,25 +328,58 @@
       moveIndicator(link, false);
     }
 
-    links.forEach(function (link, index) {
-      var target = document.querySelector(link.getAttribute("href"));
-      if (!target) {
-        return;
-      }
+    function updateCurrentSection(scrollPosition) {
+      var activeRecord = sectionRecords[0];
 
-      ScrollTrigger.create({
-        id: "nav-section-" + index,
-        trigger: target,
-        start: index === 0 ? "top top" : "clamp(top 45%)",
-        onEnter: function () {
-          setCurrent(link);
-        },
-        onEnterBack: function () {
-          setCurrent(link);
+      sectionBoundaries.forEach(function (boundary, index) {
+        if (scrollPosition >= boundary) {
+          activeRecord = sectionRecords[index];
         }
       });
 
-      if (canHover) {
+      if (activeRecord) {
+        setCurrent(activeRecord.link);
+      }
+    }
+
+    function measureSectionBoundaries(scrollPosition) {
+      var viewportOffset = window.innerHeight * 0.45;
+      var maxScroll = ScrollTrigger.maxScroll(window);
+      var lastSectionFallback = Math.max(0, maxScroll - Math.min(180, window.innerHeight * 0.2));
+
+      sectionBoundaries = sectionRecords.map(function (record, index) {
+        if (index === 0) {
+          return 0;
+        }
+
+        var sectionTop = record.target.getBoundingClientRect().top + scrollPosition;
+        var boundary = Math.max(0, sectionTop - viewportOffset);
+
+        if (index === sectionRecords.length - 1) {
+          boundary = Math.min(boundary, lastSectionFallback);
+        }
+
+        return Math.min(boundary, maxScroll);
+      });
+    }
+
+    var sectionSpy = ScrollTrigger.create({
+      id: "nav-section-spy",
+      start: 0,
+      end: "max",
+      onRefresh: function (self) {
+        var scrollPosition = self.scroll();
+        measureSectionBoundaries(scrollPosition);
+        updateCurrentSection(scrollPosition);
+      },
+      onUpdate: function (self) {
+        updateCurrentSection(self.scroll());
+      }
+    });
+
+    links.forEach(function (link) {
+
+      if (canHover && motionAllowed) {
         var enter = function () {
           moveIndicator(link, false);
         };
@@ -355,7 +397,8 @@
       moveIndicator(currentLink, true);
     }
 
-    setCurrent(currentLink);
+    measureSectionBoundaries(window.scrollY);
+    updateCurrentSection(window.scrollY);
     requestAnimationFrame(function () {
       moveIndicator(currentLink, true);
     });
@@ -371,6 +414,11 @@
         link.classList.remove("is-current");
         link.removeAttribute("aria-current");
       });
+      mobileLinks.forEach(function (link) {
+        link.classList.remove("is-current");
+        link.removeAttribute("aria-current");
+      });
+      sectionSpy.kill();
       indicator.remove();
     };
   }
@@ -503,7 +551,7 @@
         duration: motion.duration.reveal,
         ease: motion.ease.text
       }, "-=0.34")
-      .from(faq.querySelectorAll("details"), {
+      .from(faq.querySelectorAll(".faq-item"), {
         autoAlpha: 0,
         y: 26,
         duration: 0.64,
@@ -609,6 +657,7 @@
     var layers = [];
     var states = [];
     var delayedCalls = [];
+    var confettiBursts = [];
     var pointerFrame = 0;
     var resizeFrame = 0;
     var pointer = { x: -10000, y: -10000 };
@@ -709,38 +758,123 @@
       });
     }
 
-    function createParticles(state) {
-      var particleCount = 6;
+    function createConfettiBurst(balloonElement) {
+      var bounds = balloonElement.getBoundingClientRect();
+      var centerX = bounds.left + bounds.width / 2;
+      var centerY = bounds.top + bounds.height / 2;
+      var particleCount = reduceMotion
+        ? 3
+        : mode === "desktop"
+          ? gsap.utils.random(10, 14, 1)
+          : gsap.utils.random(6, 9, 1);
+      var colors = ["#ff7a00", "#7b3fc7", "#f452ad", "#00a7ad", "#ffd400", "#70ad29"];
+      var burstElement = document.createElement("div");
+      var fragment = document.createDocumentFragment();
+      var particles = [];
+
+      burstElement.className = "balloon-confetti-burst";
+      burstElement.setAttribute("aria-hidden", "true");
+      burstElement.style.left = centerX + "px";
+      burstElement.style.top = centerY + "px";
 
       for (var index = 0; index < particleCount; index += 1) {
         var particle = document.createElement("span");
-        var angle = (Math.PI * 2 * index) / particleCount + gsap.utils.random(-0.22, 0.22);
-        var distance = gsap.utils.random(24, 42);
+        var shape = index % 3;
 
-        particle.className = "balloon-particle";
-        particle.setAttribute("aria-hidden", "true");
-        state.anchor.appendChild(particle);
+        particle.className = "balloon-confetti";
+        particle.style.setProperty("--confetti-color", gsap.utils.random(colors));
 
-        gsap.fromTo(particle, {
-          x: 0,
-          y: 0,
-          scale: 1,
-          autoAlpha: 1,
-          rotation: gsap.utils.random(-30, 30)
-        }, {
-          x: Math.cos(angle) * distance,
-          y: Math.sin(angle) * distance,
-          scale: 0.2,
-          autoAlpha: 0,
-          rotation: gsap.utils.random(-100, 100),
-          duration: 0.38,
-          ease: "power3.out",
-          onComplete: function (target) {
-            target.remove();
-          },
-          onCompleteParams: [particle]
-        });
+        if (shape === 0) {
+          particle.style.setProperty("--confetti-width", "6px");
+          particle.style.setProperty("--confetti-height", "6px");
+          particle.style.setProperty("--confetti-radius", "50%");
+        } else if (shape === 1) {
+          particle.style.setProperty("--confetti-width", "3px");
+          particle.style.setProperty("--confetti-height", "10px");
+          particle.style.setProperty("--confetti-radius", "1px");
+        } else {
+          particle.style.setProperty("--confetti-width", "8px");
+          particle.style.setProperty("--confetti-height", "4px");
+          particle.style.setProperty("--confetti-radius", "2px");
+        }
+
+        particles.push(particle);
+        fragment.appendChild(particle);
       }
+
+      burstElement.appendChild(fragment);
+      document.body.appendChild(burstElement);
+
+      var burstRecord = { element: burstElement, timeline: null };
+      var burstTimeline = gsap.timeline({
+        onComplete: function () {
+          var recordIndex = confettiBursts.indexOf(burstRecord);
+          if (recordIndex !== -1) {
+            confettiBursts.splice(recordIndex, 1);
+          }
+          burstElement.remove();
+        }
+      });
+
+      burstRecord.timeline = burstTimeline;
+      confettiBursts.push(burstRecord);
+
+      particles.forEach(function (particle) {
+        var angle = gsap.utils.random(-Math.PI + 0.25, -0.25);
+        var distance = reduceMotion
+          ? gsap.utils.random(8, 16)
+          : mode === "desktop"
+            ? gsap.utils.random(38, 72)
+            : gsap.utils.random(26, 52);
+        var xImpulse = Math.cos(angle) * distance;
+        var yImpulse = Math.sin(angle) * distance;
+
+        gsap.set(particle, {
+          xPercent: -50,
+          yPercent: -50,
+          scale: gsap.utils.random(0.72, 1.12),
+          rotation: gsap.utils.random(-70, 70),
+          autoAlpha: 1
+        });
+
+        if (reduceMotion) {
+          burstTimeline.to(particle, {
+            x: xImpulse,
+            y: yImpulse,
+            scale: 0.55,
+            rotation: "+=" + gsap.utils.random(-45, 45),
+            autoAlpha: 0,
+            duration: 0.2,
+            ease: "power1.out"
+          }, 0);
+          return;
+        }
+
+        var impulseDuration = gsap.utils.random(0.2, 0.3);
+        var fallDuration = gsap.utils.random(0.42, 0.64);
+
+        burstTimeline
+          .to(particle, {
+            x: xImpulse,
+            y: yImpulse,
+            rotation: "+=" + gsap.utils.random(-150, 150),
+            duration: impulseDuration,
+            ease: "power2.out"
+          }, 0)
+          .to(particle, {
+            x: xImpulse * gsap.utils.random(1.15, 1.42),
+            y: gsap.utils.random(44, 82),
+            rotation: "+=" + gsap.utils.random(-320, 320),
+            duration: fallDuration,
+            ease: "power2.in"
+          }, impulseDuration)
+          .to(particle, {
+            scale: 0.5,
+            autoAlpha: 0,
+            duration: 0.2,
+            ease: "power1.in"
+          }, impulseDuration + fallDuration - 0.2);
+      });
     }
 
     function respawnBalloon(state) {
@@ -805,10 +939,6 @@
         state.rotationTo(0);
       }
 
-      if (!reduceMotion) {
-        createParticles(state);
-      }
-
       var timeline = gsap.timeline({
         onComplete: function () {
           var delayed = gsap.delayedCall(gsap.utils.random(3, 8), function () {
@@ -817,13 +947,16 @@
           delayedCalls.push(delayed);
         }
       });
+      state.popTimeline = timeline;
 
       if (reduceMotion) {
-        timeline.to(state.reactor, {
-          autoAlpha: 0,
-          duration: 0.12,
-          ease: "power1.out"
-        });
+        timeline
+          .call(createConfettiBurst, [state.body])
+          .to(state.reactor, {
+            autoAlpha: 0,
+            duration: 0.12,
+            ease: "power1.out"
+          });
         return;
       }
 
@@ -838,6 +971,7 @@
           duration: 0.1,
           ease: "back.out(2.6)"
         })
+        .call(createConfettiBurst, [state.body])
         .to(state.reactor, {
           scale: 0,
           autoAlpha: 0,
@@ -1006,6 +1140,7 @@
         anchor: anchor,
         float: float,
         reactor: reactor,
+        body: body,
         positions: positions,
         positionIndex: index % positions.length,
         centerX: 0,
@@ -1014,7 +1149,8 @@
         isPopped: false,
         xTo: null,
         yTo: null,
-        rotationTo: null
+        rotationTo: null,
+        popTimeline: null
       };
 
       applyPosition(state, positions[state.positionIndex]);
@@ -1069,8 +1205,17 @@
           call.kill();
         });
 
+        confettiBursts.forEach(function (burst) {
+          burst.timeline.kill();
+          burst.element.remove();
+        });
+        confettiBursts.length = 0;
+
         states.forEach(function (state) {
           if (hasGsap) {
+            if (state.popTimeline) {
+              state.popTimeline.kill();
+            }
             gsap.killTweensOf([state.anchor, state.float, state.reactor]);
           }
         });
@@ -1163,9 +1308,11 @@
       });
 
       balloonController = balloons;
+      var cleanupNav = setupNavIndicator(conditions.canHover);
 
       if (conditions.reduceMotion) {
         return function () {
+          cleanupNav();
           balloons.cleanup();
           if (balloonController === balloons) {
             balloonController = null;
@@ -1173,7 +1320,6 @@
         };
       }
 
-      var cleanupNav = setupNavIndicator(conditions.canHover);
       setupHeroIntro(conditions.isMobile);
       setupSectionTimelines(conditions.isMobile);
 
