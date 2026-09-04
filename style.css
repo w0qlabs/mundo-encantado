@@ -569,10 +569,14 @@ html[data-gsap-ready="true"] .site-nav a::after {
     0 8px 16px rgba(75, 46, 32, 0.1);
 }
 
+.balloon-reactor {
+  position: relative;
+}
+
 .balloon-knot {
   position: absolute;
   left: 50%;
-  top: calc(100% - 35px);
+  top: calc(100% - 1px);
   width: 12px;
   height: 10px;
   border-radius: 2px 2px 5px 5px;
@@ -584,7 +588,7 @@ html[data-gsap-ready="true"] .site-nav a::after {
 .balloon-string {
   position: absolute;
   left: 50%;
-  top: calc(100% - 26px);
+  top: calc(100% + 7px);
   width: 13px;
   height: 30px;
   border-left: 1px solid rgba(75, 46, 32, 0.38);
