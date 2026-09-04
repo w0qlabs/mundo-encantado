@@ -1202,14 +1202,12 @@ address {
 }
 
 .faq-panel {
-  display: grid;
-  grid-template-rows: 0fr;
+  height: 0;
   overflow: hidden;
-  transition: grid-template-rows 340ms var(--ease-out);
 }
 
 .faq-item.is-open .faq-panel {
-  grid-template-rows: 1fr;
+  height: auto;
 }
 
 .faq-panel-inner {
@@ -1422,10 +1420,6 @@ address {
 
   .balloon-confetti {
     will-change: auto;
-  }
-
-  .faq-panel {
-    transition-duration: 180ms;
   }
 
 }
