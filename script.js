@@ -24,6 +24,54 @@
 
   document.documentElement.dataset.gsapReady = hasGsap ? "true" : "false";
 
+  function setupMobileNavigation() {
+    var button = document.querySelector(".menu-toggle");
+    var navigation = document.getElementById("mobile-nav");
+
+    if (!button || !navigation) {
+      return;
+    }
+
+    function closeMenu() {
+      button.setAttribute("aria-expanded", "false");
+      button.setAttribute("aria-label", "Abrir menu");
+      navigation.hidden = true;
+    }
+
+    button.addEventListener("click", function () {
+      var shouldOpen = button.getAttribute("aria-expanded") !== "true";
+      button.setAttribute("aria-expanded", String(shouldOpen));
+      button.setAttribute("aria-label", shouldOpen ? "Fechar menu" : "Abrir menu");
+      navigation.hidden = !shouldOpen;
+    });
+
+    navigation.addEventListener("click", function (event) {
+      if (event.target.closest("a")) {
+        closeMenu();
+      }
+    }, true);
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        closeMenu();
+        button.focus();
+      }
+    });
+
+    var desktopQuery = window.matchMedia("(min-width: 981px)");
+    var handleDesktopChange = function (event) {
+      if (event.matches) {
+        closeMenu();
+      }
+    };
+
+    if (desktopQuery.addEventListener) {
+      desktopQuery.addEventListener("change", handleDesktopChange);
+    } else {
+      desktopQuery.addListener(handleDesktopChange);
+    }
+  }
+
   function setupTabs() {
     var tabs = Array.prototype.slice.call(document.querySelectorAll(".category-tab"));
     var panels = Array.prototype.slice.call(document.querySelectorAll(".category-panel"));
@@ -1085,6 +1133,7 @@
   setupTabs();
   setupFaqCards();
   setupSmoothNavigation();
+  setupMobileNavigation();
 
   if (!hasGsap || !window.ScrollTrigger) {
     balloonController = setupInteractiveBalloons({
