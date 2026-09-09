@@ -150,26 +150,13 @@
         card: card,
         question: card.querySelector(".faq-question"),
         panel: card.querySelector(".faq-panel"),
-        inner: card.querySelector(".faq-panel-inner"),
-        animation: null
+        inner: card.querySelector(".faq-panel-inner")
       };
     }).filter(function (record) {
       return record.question && record.panel && record.inner;
     });
 
     function setFaqItemOpen(record, shouldOpen) {
-      var currentHeight = record.panel.getBoundingClientRect().height;
-      var targetHeight = shouldOpen ? record.inner.scrollHeight : 0;
-
-      if (record.animation) {
-        record.animation.kill();
-        record.animation = null;
-      }
-
-      if (hasGsap) {
-        gsap.set(record.panel, { height: currentHeight });
-      }
-
       record.card.classList.toggle("is-open", shouldOpen);
       record.question.setAttribute("aria-expanded", String(shouldOpen));
       record.panel.setAttribute("aria-hidden", String(!shouldOpen));
@@ -178,47 +165,8 @@
       window.clearTimeout(refreshTimer);
       refreshTimer = window.setTimeout(
         refreshScrollTriggers,
-        reduceMotionQuery.matches ? 0 : 340
+        0
       );
-
-      if (!hasGsap || reduceMotionQuery.matches) {
-        if (hasGsap) {
-          gsap.set(record.panel, { height: shouldOpen ? "auto" : 0 });
-          gsap.set(record.inner, {
-            autoAlpha: shouldOpen ? 1 : 0,
-            y: shouldOpen ? 0 : -6
-          });
-        } else {
-          record.panel.style.height = shouldOpen ? "auto" : "0px";
-          record.inner.style.opacity = shouldOpen ? "1" : "0";
-          record.inner.style.visibility = shouldOpen ? "visible" : "hidden";
-          record.inner.style.transform = shouldOpen ? "translateY(0)" : "translateY(-6px)";
-        }
-        return;
-      }
-
-      gsap.killTweensOf([record.panel, record.inner]);
-      record.animation = gsap.timeline({
-        defaults: {
-          ease: "power2.out",
-          overwrite: "auto"
-        },
-        onComplete: function () {
-          gsap.set(record.panel, { height: shouldOpen ? "auto" : 0 });
-          record.animation = null;
-        }
-      });
-
-      record.animation
-        .to(record.panel, {
-          height: targetHeight,
-          duration: 0.32
-        }, 0)
-        .to(record.inner, {
-          autoAlpha: shouldOpen ? 1 : 0,
-          y: shouldOpen ? 0 : -6,
-          duration: 0.22
-        }, shouldOpen ? 0.03 : 0);
     }
 
     records.forEach(function (record) {
@@ -227,14 +175,6 @@
       record.question.setAttribute("aria-expanded", String(isOpen));
       record.panel.setAttribute("aria-hidden", String(!isOpen));
       record.panel.inert = !isOpen;
-
-      if (hasGsap) {
-        gsap.set(record.panel, { height: isOpen ? "auto" : 0 });
-        gsap.set(record.inner, {
-          autoAlpha: isOpen ? 1 : 0,
-          y: isOpen ? 0 : -6
-        });
-      }
 
       record.question.addEventListener("click", function () {
         setFaqItemOpen(record, record.question.getAttribute("aria-expanded") !== "true");

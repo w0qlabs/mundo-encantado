@@ -158,7 +158,7 @@ a {
 
 .nav-bar {
   display: flex;
-  min-height: 76px;
+  min-height: 84px;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
@@ -171,41 +171,25 @@ a {
   min-width: 0;
 }
 
-.brand strong {
-  display: block;
-  color: var(--orange-deep);
-  font-family: "Kalam", cursive;
-  font-size: clamp(1.4rem, 2.5vw, 2rem);
-  line-height: 0.95;
-  text-transform: uppercase;
-}
-
-.brand small {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--purple);
-  font-family: "Baloo 2", cursive;
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.brand small::before,
-.brand small::after {
-  content: "";
-  width: 28px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--orange);
-}
-
 .brand-mark {
-  width: clamp(58px, 7vw, 86px);
+  width: clamp(96px, 10vw, 136px);
+  max-height: 92px;
   height: auto;
+  object-fit: contain;
   flex: 0 0 auto;
   filter: drop-shadow(0 8px 10px rgba(75, 46, 32, 0.12));
+}
+
+.brand-wordmark {
+  width: clamp(150px, 18vw, 240px);
+  height: auto;
+  max-width: 100%;
+  flex: 0 1 auto;
+  object-fit: contain;
+}
+
+.footer-brand .brand-wordmark {
+  width: clamp(120px, 14vw, 170px);
 }
 
 .site-nav {
@@ -1235,10 +1219,6 @@ address {
   transform: translateY(0);
 }
 
-[data-gsap-ready="true"] .faq-panel-inner {
-  transition: none;
-}
-
 .faq-panel-inner p {
   margin: 0;
   padding: 0 20px 20px;
@@ -1357,11 +1337,6 @@ address {
   flex-wrap: wrap;
 }
 
-.footer-brand strong,
-.footer-brand small {
-  color: #fff;
-}
-
 .footer-grid p {
   max-width: 32rem;
   margin: 0;
@@ -1444,6 +1419,15 @@ address {
   .category-panel.is-active {
     transform: none;
     transition: opacity 200ms ease;
+  }
+
+  .faq-panel,
+  .faq-panel-inner {
+    transition: none;
+  }
+
+  .faq-panel-inner {
+    transform: none;
   }
 
   @starting-style {
@@ -1580,7 +1564,7 @@ address {
   }
 
   .nav-bar {
-    min-height: 66px;
+    min-height: 72px;
     gap: 12px;
   }
 
@@ -1588,22 +1572,17 @@ address {
     gap: 8px;
   }
 
-  .brand strong {
-    font-size: 1rem;
-  }
-
-  .brand small {
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-  }
-
-  .brand small::before,
-  .brand small::after {
-    width: 12px;
-  }
-
   .brand-mark {
-    width: 44px;
+    width: 68px;
+    max-height: 68px;
+  }
+
+  .brand-wordmark {
+    width: 150px;
+  }
+
+  .footer-brand .brand-wordmark {
+    width: 138px;
   }
 
   .header-action {
@@ -1733,22 +1712,21 @@ address {
   }
 
   .nav-bar {
-    min-height: 62px;
+    min-height: 68px;
     gap: 8px;
   }
 
   .brand-mark {
-    width: 40px;
+    width: 52px;
+    max-height: 52px;
   }
 
-  .brand strong {
-    max-width: 9ch;
-    font-size: 0.92rem;
-    line-height: 0.86;
+  .brand-wordmark {
+    width: 132px;
   }
 
-  .brand small {
-    display: none;
+  .footer-brand .brand-wordmark {
+    width: 122px;
   }
 
   .header-action {
