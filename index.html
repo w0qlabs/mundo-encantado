@@ -89,6 +89,14 @@
     <symbol id="icon-whatsapp" viewBox="0 0 24 24">
       <path d="M12.03 2C6.53 2 2.06 6.46 2.06 11.95c0 1.76.46 3.48 1.34 5L2 22l5.18-1.36a9.93 9.93 0 0 0 4.85 1.24h.01c5.49 0 9.96-4.46 9.96-9.95C22 6.46 17.53 2 12.03 2Zm0 18.18h-.01a8.23 8.23 0 0 1-4.2-1.15l-.3-.18-3.07.8.82-2.99-.2-.31a8.17 8.17 0 0 1-1.25-4.4 8.22 8.22 0 1 1 8.21 8.23Zm4.5-6.15c-.25-.12-1.46-.72-1.68-.8-.23-.08-.39-.12-.56.12-.16.25-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.14.17-.25.25-.41.08-.17.04-.31-.02-.44-.06-.12-.56-1.34-.77-1.84-.2-.48-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31-.23.25-.87.85-.87 2.07s.89 2.4 1.02 2.57c.12.16 1.75 2.67 4.23 3.74.59.25 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.46-.6 1.66-1.17.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.28Z"/>
     </symbol>
+    <symbol id="icon-instagram" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="icon-facebook" viewBox="0 0 24 24">
+      <path d="M14.5 22v-8h2.7l.4-3h-3.1V9.1c0-.9.3-1.5 1.6-1.5h1.7V4.9c-.3 0-1.2-.1-2.2-.1-2.3 0-3.9 1.4-3.9 4v2.2H9v3h2.7v8h2.8Z"/>
+    </symbol>
   </svg>
 
   <header class="site-header">
@@ -198,7 +206,8 @@
 
         <div class="category-tabs" role="tablist" aria-label="Categorias do catálogo">
           <button class="category-tab is-active" type="button" data-tab="estruturas" role="tab" aria-selected="true"><svg class="tab-icon" aria-hidden="true"><use href="#icon-castle"></use></svg>Estruturas</button>
-          <button class="category-tab" type="button" data-tab="recreacao" role="tab" aria-selected="false"><svg class="tab-icon" aria-hidden="true"><use href="#icon-balloons"></use></svg>Recreação infantil</button>
+          <button class="category-tab" type="button" data-tab="brinquedos" role="tab" aria-selected="false"><svg class="tab-icon" aria-hidden="true"><use href="#icon-balloons"></use></svg>Brinquedos</button>
+          <button class="category-tab" type="button" data-tab="recreacao" role="tab" aria-selected="false"><svg class="tab-icon" aria-hidden="true"><use href="#icon-balloons"></use></svg>Recreação</button>
           <button class="category-tab" type="button" data-tab="mesas" role="tab" aria-selected="false"><svg class="tab-icon" aria-hidden="true"><use href="#icon-table"></use></svg>Mesas e toalhas</button>
           <button class="category-tab" type="button" data-tab="loucas" role="tab" aria-selected="false"><svg class="tab-icon" aria-hidden="true"><use href="#icon-plate"></use></svg>Louças</button>
           <button class="category-tab" type="button" data-tab="moveis" role="tab" aria-selected="false"><svg class="tab-icon" aria-hidden="true"><use href="#icon-sofa"></use></svg>Móveis</button>
@@ -218,14 +227,26 @@
           </div>
         </div>
 
-        <div class="category-panel" id="panel-recreacao" role="tabpanel">
+        <div class="category-panel" id="panel-brinquedos" role="tabpanel">
           <div class="panel-layout">
-            <div class="panel-media"><img src="assets/Antonella.jpg" alt="Criança brincando com brinquedos"></div>
+            <div class="panel-media"><img src="assets/antonella.jpg" alt="Criança brincando com brinquedos"></div>
             <div class="panel-content">
               <svg class="panel-icon icon-purple" aria-hidden="true"><use href="#icon-balloons"></use></svg>
-              <h3>Brinquedos e recreação</h3>
-              <p>Pula-pula, brinquedos infláveis e atividades para manter a criançada envolvida.</p>
+              <h3>Brinquedos para a festa</h3>
+              <p>Pula-pula e brinquedos infláveis para deixar a criançada entretida durante o evento.</p>
               <a class="inline-action" href="https://mundoencantadoavare.my.canva.site/brinquedos" target="_blank" rel="noopener">Ver catálogo de brinquedos</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-panel" id="panel-recreacao" role="tabpanel">
+          <div class="panel-layout">
+            <div class="panel-media"><img src="assets/Recreacao.jpeg" alt="Atividades de recreação infantil em uma festa"></div>
+            <div class="panel-content">
+              <svg class="panel-icon icon-teal" aria-hidden="true"><use href="#icon-balloons"></use></svg>
+              <h3>Recreação infantil</h3>
+              <p>Atividades e brincadeiras guiadas para envolver as crianças e tornar a comemoração ainda mais especial.</p>
+              <a class="inline-action" href="https://wa.me/5514996840898" target="_blank" rel="noopener">Consultar recreação</a>
             </div>
           </div>
         </div>
@@ -415,8 +436,14 @@
       </div>
       <p>Há 18 anos criando momentos que ficam para sempre.</p>
       <div class="socials">
-        <a href="https://instagram.com/mundoencantadoavare" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://facebook.com/mundoencantadoavare" target="_blank" rel="noopener">Facebook</a>
+        <a class="social-link social-link-instagram" href="https://instagram.com/mundoencantadoavare" target="_blank" rel="noopener" aria-label="Instagram do Mundo Encantado">
+          <svg class="social-icon social-icon-instagram" aria-hidden="true"><use href="#icon-instagram"></use></svg>
+          <span>Instagram</span>
+        </a>
+        <a class="social-link social-link-facebook" href="https://facebook.com/mundoencantadoavare" target="_blank" rel="noopener" aria-label="Facebook do Mundo Encantado">
+          <svg class="social-icon social-icon-facebook" aria-hidden="true"><use href="#icon-facebook"></use></svg>
+          <span>Facebook</span>
+        </a>
       </div>
     </div>
     <div class="w0qlabs-watermark" aria-hidden="true">
