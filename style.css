@@ -108,10 +108,35 @@ a {
   right: clamp(8px, 2vw, 28px);
   bottom: 4px;
   width: clamp(112px, 15vw, 190px);
-  pointer-events: none;
   opacity: 0.78;
-  transform: rotate(-5deg);
   transform-origin: bottom right;
+  display: grid;
+  justify-items: center;
+  color: #fff;
+}
+
+.footer-credit {
+  position: relative;
+  margin-top: -12%;
+  padding: 0 10px 10px;
+  color: #fff4e4;
+  font: 800 clamp(1.15rem, 2vw, 1.55rem)/1 "Baloo 2", cursive;
+  letter-spacing: -0.04em;
+  -webkit-text-stroke: 0.6px #291b18;
+  paint-order: stroke fill;
+  text-shadow: 1px 2px 0 #d51e32, 2px 3px 0 #291b18;
+  transform: rotate(-5deg);
+}
+
+.footer-monkey-watermark:hover {
+  opacity: 1;
+}
+
+.footer-monkey-watermark:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--yellow);
+  outline-offset: -2px;
+  border-radius: var(--radius);
 }
 
 .footer-monkey-watermark img {
@@ -1335,7 +1360,7 @@ address {
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  padding-right: 44px;
+  padding-right: clamp(112px, 15vw, 190px);
   flex-wrap: wrap;
 }
 
@@ -1812,7 +1837,8 @@ address {
   }
 
   .footer-grid {
-    padding-right: 36px;
+    padding-right: 0;
+    padding-bottom: 80px;
   }
 
   .socials {
