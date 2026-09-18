@@ -108,9 +108,9 @@ a {
 
 .footer-monkey-watermark {
   position: absolute;
-  right: clamp(8px, 2vw, 28px);
-  bottom: 4px;
-  width: clamp(112px, 15vw, 190px);
+  right: max(2px, env(safe-area-inset-right));
+  bottom: max(1px, env(safe-area-inset-bottom));
+  width: clamp(84px, 9vw, 124px);
   opacity: 0.78;
   transform-origin: bottom right;
   display: grid;
@@ -1383,7 +1383,7 @@ address {
   align-items: center;
   justify-content: space-between;
   gap: 22px;
-  padding-right: clamp(112px, 15vw, 190px);
+  padding-right: clamp(84px, 9vw, 124px);
   flex-wrap: wrap;
 }
 
@@ -1854,7 +1854,7 @@ address {
 
   .footer-grid {
     padding-right: 0;
-    padding-bottom: 80px;
+    padding-bottom: 60px;
   }
 
   .socials {
@@ -1862,9 +1862,9 @@ address {
   }
 
   .footer-monkey-watermark {
-    right: 8px;
-    bottom: 3px;
-    width: 112px;
+    right: max(1px, env(safe-area-inset-right));
+    bottom: max(1px, env(safe-area-inset-bottom));
+    width: 76px;
   }
 }
 
@@ -2109,7 +2109,7 @@ address {
 
   .footer-grid {
     gap: 18px;
-    padding-right: 84px;
+    padding-right: 60px;
   }
 
   .balloon-layer {
@@ -2149,7 +2149,7 @@ address {
   }
 
   .footer-grid {
-    padding-right: 74px;
+    padding-right: 52px;
   }
 }
 
