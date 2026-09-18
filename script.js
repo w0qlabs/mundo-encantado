@@ -569,7 +569,16 @@
   function setupHeroIntro(isMobile) {
     gsap.set(".title-forever", { "--underline-scale": 0 });
 
-    var navigationTargets = isMobile ? ".header-action" : ".site-nav a, .header-action";
+    // On touch layouts, immediate content is faster, more stable and easier to scan.
+    if (isMobile) {
+      gsap.set(".title-forever", { "--underline-scale": 1 });
+      gsap.set(".hero h1, .hero-text, .hero-actions .btn, .hero-showcase, .birthday-seal, .doodle", {
+        clearProps: "opacity,visibility,transform,clipPath"
+      });
+      return;
+    }
+
+    var navigationTargets = ".site-nav a, .header-action";
     var timeline = gsap.timeline({
       defaults: { ease: motion.ease.reveal }
     });
@@ -582,7 +591,6 @@
         duration: 0.42,
         stagger: 0.045
       }, "<0.08")
-      .from(".hero .eyebrow", { autoAlpha: 0, y: 20, duration: 0.52 }, "-=0.18")
       .from(".hero h1", {
         autoAlpha: 0,
         y: isMobile ? 36 : 52,
@@ -640,8 +648,16 @@
     var confettiBursts = [];
     var pointerFrame = 0;
     var resizeFrame = 0;
+    var resizeObserver = null;
     var pointer = { x: -10000, y: -10000 };
     var isCleanedUp = false;
+    var colorLabels = {
+      orange: "laranja",
+      purple: "roxo",
+      pink: "rosa",
+      teal: "azul",
+      yellow: "amarelo"
+    };
 
     var balloonConfigs = [
       {
@@ -651,7 +667,7 @@
         positions: {
           desktop: [{ left: "1.2%", top: "12%" }, { left: "4.5%", top: "62%" }],
           tablet: [{ left: "-1%", top: "56%" }, { left: "3%", top: "72%" }],
-          mobile: [{ left: "-18px", top: "48%" }, { left: "-14px", top: "70%" }]
+          mobile: [{ left: "-6px", top: "46%" }, { left: "2px", top: "72%" }]
         }
       },
       {
@@ -682,7 +698,7 @@
         positions: {
           desktop: [{ right: "2%", top: "14%" }, { right: "5%", top: "61%" }],
           tablet: [{ right: "-1%", top: "18%" }, { right: "2%", top: "66%" }],
-          mobile: [{ right: "-18px", top: "8%" }, { right: "-14px", top: "68%" }]
+          mobile: [{ right: "-6px", top: "7%" }, { right: "2px", top: "70%" }]
         }
       },
       {
@@ -692,7 +708,7 @@
         positions: {
           desktop: [{ left: "1%", top: "8%" }, { left: "3%", top: "76%" }],
           tablet: [{ left: "-1%", top: "5%" }, { left: "1%", top: "72%" }],
-          mobile: null
+          mobile: [{ right: "-6px", top: "5%" }, { right: "2px", top: "78%" }]
         }
       },
       {
@@ -712,7 +728,7 @@
         positions: {
           desktop: [{ left: "1.4%", top: "58%" }, { left: "5%", top: "12%" }],
           tablet: [{ right: "-1%", top: "16%" }, { right: "2%", top: "67%" }],
-          mobile: [{ right: "-18px", top: "48%" }, { right: "-14px", top: "75%" }]
+          mobile: [{ right: "-6px", top: "48%" }, { right: "2px", top: "76%" }]
         }
       }
     ];
@@ -869,6 +885,9 @@
         state.reactor.style.opacity = "1";
         state.reactor.style.transform = "scale(1)";
         state.anchor.style.pointerEvents = "auto";
+        state.anchor.disabled = false;
+        state.anchor.dataset.state = "ready";
+        state.anchor.setAttribute("aria-label", state.readyLabel);
         state.isPopped = false;
         refreshPositions();
         return;
@@ -889,6 +908,9 @@
         overwrite: "auto",
         onComplete: function () {
           state.anchor.style.pointerEvents = "auto";
+          state.anchor.disabled = false;
+          state.anchor.dataset.state = "ready";
+          state.anchor.setAttribute("aria-label", state.readyLabel);
           state.isPopped = false;
           refreshPositions();
         }
@@ -902,6 +924,9 @@
 
       state.isPopped = true;
       state.anchor.style.pointerEvents = "none";
+      state.anchor.disabled = true;
+      state.anchor.dataset.state = "popped";
+      state.anchor.setAttribute("aria-label", "Balão estourado. Ele voltará em instantes.");
 
       if (!hasGsap) {
         state.reactor.style.transition = "opacity 140ms ease, transform 140ms ease";
@@ -1079,7 +1104,6 @@
       if (!layerRecord) {
         var layer = document.createElement("div");
         layer.className = config.foreground ? "balloon-layer balloon-layer-foreground" : "balloon-layer";
-        layer.setAttribute("aria-hidden", "true");
         host.classList.add("balloon-host");
         host.appendChild(layer);
         layerRecord = {
@@ -1098,10 +1122,12 @@
       var string = document.createElement("span");
 
       anchor.type = "button";
-      anchor.tabIndex = -1;
       anchor.className = "balloon-anchor";
       anchor.dataset.color = config.color;
-      anchor.setAttribute("aria-hidden", "true");
+      anchor.dataset.state = "ready";
+      var readyLabel = "Estourar balão " + colorLabels[config.color];
+      anchor.setAttribute("aria-label", readyLabel);
+      anchor.title = readyLabel;
       anchor.style.setProperty("--balloon-size", config.size[mode] + "px");
       float.className = "balloon-float";
       reactor.className = "balloon-reactor";
@@ -1130,7 +1156,8 @@
         xTo: null,
         yTo: null,
         rotationTo: null,
-        popTimeline: null
+        popTimeline: null,
+        readyLabel: readyLabel
       };
 
       applyPosition(state, positions[state.positionIndex]);
@@ -1160,6 +1187,17 @@
     window.addEventListener("resize", handleResize, { passive: true });
     window.addEventListener("load", refreshPositions, { once: true });
 
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", handleResize, { passive: true });
+    }
+
+    if (window.ResizeObserver) {
+      resizeObserver = new ResizeObserver(handleResize);
+      layers.forEach(function (record) {
+        resizeObserver.observe(record.host);
+      });
+    }
+
     if (hasGsap && canHover && !reduceMotion) {
       window.addEventListener("pointermove", handlePointerMove, { passive: true });
       document.documentElement.addEventListener("mouseleave", resetRepulsion);
@@ -1173,6 +1211,12 @@
         window.removeEventListener("load", refreshPositions);
         window.removeEventListener("pointermove", handlePointerMove);
         document.documentElement.removeEventListener("mouseleave", resetRepulsion);
+        if (window.visualViewport) {
+          window.visualViewport.removeEventListener("resize", handleResize);
+        }
+        if (resizeObserver) {
+          resizeObserver.disconnect();
+        }
 
         if (pointerFrame) {
           cancelAnimationFrame(pointerFrame);
